@@ -1,3 +1,4 @@
+use generics::{NewsArticle, Summary};
 struct Point<T> {
     x: T,
     y: T,
@@ -31,4 +32,8 @@ fn main() {
    };
    let x = p.x();
     println!("p.x = {x}");
+    let article = NewsArticle {
+        text: String::from("news text")
+    };
+    article.summarize();
 }
