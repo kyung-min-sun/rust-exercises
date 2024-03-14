@@ -1,3 +1,5 @@
+use iterators::add_one;
+
 #[derive(Debug, PartialEq, Copy, Clone)]
 enum ShirtColor {
     Red,
@@ -43,6 +45,7 @@ fn main() {
     };
     let user_pref1 = Some(ShirtColor::Red);
     let giveaway1 = store.giveaway(user_pref1);
+    add_one(1);
 
     println!(
         "The user with preference {:?} gets {:?}",
@@ -70,6 +73,7 @@ fn main() {
             height: 12,
         },
     ];
+    list[0].height;
 
     list.sort_by_key(|r| r.width);
     println!("{:#?}", list);
