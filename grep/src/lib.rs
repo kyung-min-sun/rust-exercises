@@ -11,14 +11,18 @@ pub struct Config {
 }
 
 impl Config {
-    pub fn build(args: &[String]) -> Result<Config, &'static str> {
-        if args.len() < 3 {
-            return Err("not enough arguments");
-        }
+    pub fn build(mut args: impl Iterator<Item = String>) -> Result<Config, &'static str> {
+        args.next();
 
         Ok(Config {
-            regex: args[1].clone(),
-            file_path: args[2].clone(),
+            regex: match args.next() {
+                Some(arg) => arg,
+                None => return Err("didn't get query string"),
+            },
+            file_path: match args.next() {
+                Some(arg) => arg,
+                None => return Err("didn't get a file path"),
+            },
             ignore_case: env::var("IGNORE_CASE").is_ok(),
         })
     }

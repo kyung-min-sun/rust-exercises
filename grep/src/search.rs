@@ -1,10 +1,7 @@
 pub fn search_file<'a>(regex: &str, contents: &'a str) -> Vec<&'a str> {
     contents
         .lines()
-        .filter_map(|line| match line.contains(regex) {
-            true => Some(line),
-            false => None,
-        })
+        .filter(|line| line.contains(regex))
         .collect()
 }
 
@@ -12,12 +9,7 @@ pub fn search_file_case_insensitive<'a>(regex: &str, contents: &'a str) -> Vec<&
     let lowercase_regex = regex.to_lowercase();
     contents
         .lines()
-        .filter_map(
-            |line| match line.to_lowercase().contains(&lowercase_regex) {
-                true => Some(line),
-                false => None,
-            },
-        )
+        .filter(|line| line.to_lowercase().contains(&lowercase_regex))
         .collect()
 }
 

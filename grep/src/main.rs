@@ -1,8 +1,7 @@
 use std::{env, process};
 
 fn main() {
-    let args: Vec<String> = env::args().collect();
-    let config = grep::Config::build(&args).unwrap_or_else(|err| {
+    let config = grep::Config::build(env::args()).unwrap_or_else(|err| {
         eprintln!("problem parsing arguments: {err}");
         process::exit(1);
     });
@@ -12,6 +11,6 @@ fn main() {
             eprintln!("Application error: {e}");
             process::exit(1);
         }
-        Ok(_) => return,
+        Ok(_) => process::exit(0),
     };
 }
