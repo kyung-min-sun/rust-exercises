@@ -1,18 +1,11 @@
-mod json;
-mod request;
-mod response;
+mod infra;
+mod parsers;
 mod routes;
-mod thread_pool;
 
-use request::HttpRequest;
-use response::{http_error, HttpResponse};
-use routes::*;
-use std::{
-    fs,
-    net::{TcpListener, TcpStream},
-};
+use infra::thread_pool::ThreadPool;
+use parsers::{request, response};
 
-use thread_pool::ThreadPool;
+use std::net::{TcpListener, TcpStream};
 
 pub fn run() {
     let listener = TcpListener::bind("127.0.0.1:8000").unwrap();
@@ -34,7 +27,7 @@ fn handle_connection(stream: TcpStream) {
         None => {
             return response::send_response(
                 stream,
-                http_error(response::HttpCode::BadRequest, "could not parse headers"),
+                response::http_error(response::HttpCode::BadRequest, "could not parse headers"),
             )
         }
     };
@@ -44,38 +37,5 @@ fn handle_connection(stream: TcpStream) {
         Err(response) => return response::send_response(stream, response),
     };
 
-    let HttpRequest {
-        method,
-        uri,
-        headers,
-        body,
-    } = request;
-
-    match (method.as_str(), uri.as_str()) {
-        ("GET", "/") => response::send_response(
-            stream,
-            hello_world(HttpRequest {
-                method,
-                uri,
-                headers,
-                body,
-            }),
-        ),
-        ("POST", "/") => response::send_response(
-            stream,
-            test_post(HttpRequest {
-                method,
-                uri,
-                headers,
-                body,
-            }),
-        ),
-        _ => response::send_response(
-            stream,
-            response::http_error(
-                response::HttpCode::NotFound,
-                &fs::read_to_string("./src/404.html").unwrap(),
-            ),
-        ),
-    }
+    routes::handle_request(request, stream);
 }

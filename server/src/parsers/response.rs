@@ -1,6 +1,6 @@
 use std::{io::Write, net::TcpStream};
 
-use crate::json::JsonValue;
+use super::json::JsonValue;
 
 pub enum HttpCode {
     Ok,
