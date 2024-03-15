@@ -5,7 +5,7 @@ mod routes;
 mod thread_pool;
 
 use request::HttpRequest;
-use response::HttpResponse;
+use response::{http_error, HttpResponse};
 use routes::*;
 use std::{
     fs,
@@ -29,9 +29,17 @@ pub fn run() {
 }
 
 fn handle_connection(stream: TcpStream) {
-    let request_lines = request::split_request(&stream);
+    let (headers, body) = match request::split_request(&stream) {
+        Some(value) => value,
+        None => {
+            return response::send_response(
+                stream,
+                http_error(response::HttpCode::BadRequest, "could not parse headers"),
+            )
+        }
+    };
 
-    let request = match request::parse_request(request_lines) {
+    let request = match request::parse_request(headers, body) {
         Ok(request) => request,
         Err(response) => return response::send_response(stream, response),
     };
@@ -53,9 +61,21 @@ fn handle_connection(stream: TcpStream) {
                 body,
             }),
         ),
+        ("POST", "/") => response::send_response(
+            stream,
+            test_post(HttpRequest {
+                method,
+                uri,
+                headers,
+                body,
+            }),
+        ),
         _ => response::send_response(
             stream,
-            response::http_error(404, &fs::read_to_string("./src/404.html").unwrap()),
+            response::http_error(
+                response::HttpCode::NotFound,
+                &fs::read_to_string("./src/404.html").unwrap(),
+            ),
         ),
     }
 }
