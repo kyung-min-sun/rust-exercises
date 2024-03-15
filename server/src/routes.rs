@@ -6,6 +6,6 @@ pub fn hello_world(_: HttpRequest) -> HttpResponse {
     HttpResponse {
         code: 200,
         message: "Ok".to_string(),
-        body: fs::read_to_string("./src/hello.html").unwrap(),
+        body: Box::new(fs::read_to_string("./src/hello.html").unwrap()),
     }
 }
