@@ -1,6 +1,5 @@
 use std::{
     collections::HashMap,
-    fmt::format,
     num::{ParseFloatError, ParseIntError},
 };
 
